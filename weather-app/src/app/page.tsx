@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { Loading } from "@/components/Loading";
-import { format, fromUnixTime } from "date-fns";
+import { format, fromUnixTime, parseISO } from "date-fns";
 import { Container } from "@/components/Container";
 import { convertKelvinToCelsius } from "@/utils/convertKelvinToCelsius";
 import { WeatherIcon } from "@/components/WheatherIcon";
@@ -12,6 +12,8 @@ import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
 import { WeatherDetails } from "@/components/WeatherDetails";
 import { metersToKilometers } from "@/utils/metersToKilometers";
 import { convertWindSpeed } from "@/utils/convertWindSpeed";
+import { list } from "postcss";
+import { ForecastWeatherDetails } from "@/components/ForecastWeatherDetails";
 
 interface WeatherDetail {
   dt: number;
@@ -78,6 +80,22 @@ export default function Home() {
 
       return data;
     }
+  );
+
+  const uniqueDates = [
+    ...new Set(
+      data?.list.map(
+        (entry) => new Date(entry.dt * 1000).toISOString().split("T")[0]
+      )
+    ),
+  ];
+
+  const firstDateForEachdate = uniqueDates.map((date) =>
+    data?.list.find((entry) => {
+      const entryDate = new Date(entry.dt * 1000).toISOString().split("T")[0];
+      const entryTime = new Date(entry.dt * 1000).getHours();
+      return entryDate === date && entryTime >= 6;
+    })
   );
 
   if (isLoading) return <Loading />;
@@ -175,6 +193,31 @@ export default function Home() {
 
         <section className="flex w-full flex-col gap-4">
           <p className="text-2xl">Forcast (7 days)</p>
+          {firstDateForEachdate.map((d, i) => (
+            <ForecastWeatherDetails
+              key={`${d?.dt} ${i}`}
+              description={d?.weather[0].description ?? ""}
+              weatherIcon={d?.weather[0].icon ?? "01d"}
+              date={format(parseISO(d?.dt_txt ?? ""), "dd.MM")}
+              day={format(parseISO(d?.dt_txt ?? ""), "EEEE")}
+              feels_like={d?.main.feels_like ?? 0}
+              temp={d?.main.temp ?? 0}
+              temp_min={d?.main.temp_min ?? 0}
+              temp_max={d?.main.temp_max ?? 0}
+              visability={metersToKilometers(d?.visibility ?? 10000)}
+              airPresure={`${d?.main.pressure} hPa`}
+              humidity={`${d?.main.humidity} %`}
+              sunrise={format(
+                fromUnixTime(data?.city.sunrise ?? 1702949452),
+                "H:mm"
+              )}
+              sunset={format(
+                fromUnixTime(data?.city.sunset ?? 170294957),
+                "H:mm"
+              )}
+              windSpeed={convertWindSpeed(d?.wind.speed ?? 1.64)}
+            />
+          ))}
         </section>
       </main>
     </div>
