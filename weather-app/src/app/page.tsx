@@ -14,6 +14,9 @@ import { metersToKilometers } from "@/utils/metersToKilometers";
 import { convertWindSpeed } from "@/utils/convertWindSpeed";
 import { list } from "postcss";
 import { ForecastWeatherDetails } from "@/components/ForecastWeatherDetails";
+import { placeAtom } from "./atom";
+import { useAtom } from "jotai";
+import { useEffect } from "react";
 
 interface WeatherDetail {
   dt: number;
@@ -50,7 +53,7 @@ interface WeatherDetail {
   dt_txt: string;
 }
 
-interface WeatherData {
+export interface WeatherData {
   cod: string;
   message: number;
   cnt: number;
@@ -71,11 +74,13 @@ interface WeatherData {
 }
 
 export default function Home() {
-  const { isLoading, error, data } = useQuery<WeatherData>(
+  const [place, setPlace] = useAtom(placeAtom);
+
+  const { isLoading, error, data, refetch } = useQuery<WeatherData>(
     "repoData",
     async () => {
       const { data } = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=luanda&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=30`
+        `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=56`
       );
 
       return data;
@@ -98,13 +103,17 @@ export default function Home() {
     })
   );
 
+  useEffect(() => {
+    refetch();
+  }, [place, refetch]);
+
   if (isLoading) return <Loading />;
 
   const firstData = data?.list[0];
 
   return (
     <div className="flex flex-col gap-4 bg-gray-100 min-h-screen">
-      <Navbar />
+      <Navbar location={data?.city.name ?? ""} />
       <main className="px-3 max-w-7xl mx-auto flex flex-col gap-9 w-full pb-10 pt-4">
         {/* today */}
         <section className="space-y-4">
@@ -198,8 +207,8 @@ export default function Home() {
               key={`${d?.dt} ${i}`}
               description={d?.weather[0].description ?? ""}
               weatherIcon={d?.weather[0].icon ?? "01d"}
-              date={format(parseISO(d?.dt_txt ?? ""), "dd.MM")}
-              day={format(parseISO(d?.dt_txt ?? ""), "EEEE")}
+              date={format(d?.dt_txt ?? "", "dd-MM")}
+              day={format(d?.dt_txt ?? "", "EEEE")}
               feels_like={d?.main.feels_like ?? 0}
               temp={d?.main.temp ?? 0}
               temp_min={d?.main.temp_min ?? 0}
