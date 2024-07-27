@@ -3,7 +3,7 @@ import { Lesson } from "./Lesson";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { useAppSelector } from "../store";
 import { useDispatch } from "react-redux";
-import { play } from "../store/slices/player";
+import { play, useCurrent } from "../store/slices/player";
 
 interface Props {
   title: string;
@@ -12,8 +12,9 @@ interface Props {
 }
 export function Module({ amountOfLessons, moduleIndex, title }: Props) {
   const module = useAppSelector(
-    (store) => store.player.course.modules[moduleIndex]
+    (state) => state.player.course.modules[moduleIndex]
   );
+  const { currentLessonIndex, currentModuleIndex } = useCurrent();
   const dispatch = useDispatch();
   return (
     <Collapsible.Root className="group">
@@ -36,6 +37,10 @@ export function Module({ amountOfLessons, moduleIndex, title }: Props) {
               title={lesson.title}
               duraction={lesson.duration}
               onPlay={() => dispatch(play([moduleIndex, lessonIndex]))}
+              isCurrent={
+                currentModuleIndex === moduleIndex &&
+                currentLessonIndex === lessonIndex
+              }
             />
           ))}
         </nav>
