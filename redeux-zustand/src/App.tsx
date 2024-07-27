@@ -1,14 +1,13 @@
 import { Provider as RedexProvider } from "react-redux";
-import { AddTodo } from "./components/AddTodo";
-import { Todolist } from "./components/Todolist";
 import { store } from "./store";
+import { Player } from "./pages/player";
+import "./styles/global.css";
 
 function App() {
   return (
     <div>
       <RedexProvider store={store}>
-        <Todolist />
-        <AddTodo />
+        <Player />
       </RedexProvider>
     </div>
   );
