@@ -79,7 +79,7 @@ const playerSlice = createSlice({
 
       const nextModuleIndex = state.currentModuleIndex + 1;
 
-      const nextModule = state.course.modules[state.currentModuleIndex];
+      const nextModule = state.course.modules[nextModuleIndex];
 
       if (nextModule) {
         state.currentModuleIndex = nextModuleIndex;
