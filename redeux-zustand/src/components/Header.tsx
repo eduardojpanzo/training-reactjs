@@ -1,10 +1,9 @@
 import { MessageCircle } from "lucide-react";
-import { useCurrent } from "../store/slices/player";
-import { useAppSelector } from "../store";
+import { useCurrent, useStore } from "../zustand-store";
 
 export function Header() {
   const { currentLesson, currentModule } = useCurrent();
-  const isCouseLoading = useAppSelector((state) => state.player.isLoading);
+  const isCouseLoading = useStore((state) => state.isLoading);
   return (
     <div className="flex ic justify-between">
       <div className="flex flex-col gap-1">

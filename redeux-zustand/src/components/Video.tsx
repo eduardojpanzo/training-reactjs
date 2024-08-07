@@ -1,20 +1,21 @@
 import ReactPlayer from "react-player";
-import { next, useCurrent } from "../store/slices/player";
-import { useAppDispatch, useAppSelector } from "../store";
 import { Loader } from "lucide-react";
+import { useCurrent, useStore } from "../zustand-store";
 
 export function Video() {
-  const dispatch = useAppDispatch();
   const { currentLesson } = useCurrent();
-  const isCouseLoading = useAppSelector((state) => state.player.isLoading);
+  const { isLoading, next } = useStore((state) => ({
+    isLoading: state.isLoading,
+    next: state.next,
+  }));
 
   const handlePlayNex = () => {
-    dispatch(next());
+    next();
   };
 
   return (
     <div className="w-full bg-zinc-950 aspect-video">
-      {currentLesson && !isCouseLoading ? (
+      {currentLesson && !isLoading ? (
         <ReactPlayer
           width={"100%"}
           height={"100%"}
