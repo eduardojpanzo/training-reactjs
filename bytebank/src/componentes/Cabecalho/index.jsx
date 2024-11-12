@@ -1,7 +1,7 @@
-import React from "react";
-import estilos from "./Cabecalho.module.css";
-import { ReactComponent as Logo } from "./bytebank.svg";
-import avatarUsuario from "./avatar.svg";
+import React from 'react';
+import estilos from './Cabecalho.module.css';
+import { ReactComponent as Logo } from './bytebank.svg';
+import avatarUsuario from './avatar.svg';
 
 export default function Cabecalho() {
   return (
@@ -9,7 +9,7 @@ export default function Cabecalho() {
       <div className={estilos.container}>
         <Logo />
         <div className={estilos.usuario}>
-          <p>Joana Fonseca Gomes</p>
+          <p>Eduardo Panzo</p>
           <img src={avatarUsuario} alt="Ícone de um avatar de usuário" />
         </div>
       </div>
