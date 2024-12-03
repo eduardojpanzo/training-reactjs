@@ -1,3 +1,4 @@
+import { role } from "@/lib/data";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -124,16 +125,25 @@ export function Menu() {
           <span className="hidden lg:block text-gray-400 font-light my-4">
             {el.title}
           </span>
-          {el.items.map((item) => (
-            <Link
-              href={item.href}
-              className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2"
-              key={item.label}
-            >
-              <Image src={item.icon} alt={item.label} width={20} height={20} />
-              <span className="hidden lg:block">{item.label}</span>
-            </Link>
-          ))}
+          {el.items.map((item) => {
+            if (item.visible.includes(role)) {
+              return (
+                <Link
+                  href={item.href}
+                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 rounded-md hover:bg-lamaSkyLight md:px-2"
+                  key={item.label}
+                >
+                  <Image
+                    src={item.icon}
+                    alt={item.label}
+                    width={20}
+                    height={20}
+                  />
+                  <span className="hidden lg:block">{item.label}</span>
+                </Link>
+              );
+            }
+          })}
         </div>
       ))}
     </div>
