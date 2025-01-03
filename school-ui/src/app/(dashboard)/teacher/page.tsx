@@ -1,5 +1,5 @@
 import { Announcements } from "@/components/Announcements";
-import { BigCalender } from "@/components/BigCalender";
+import { BigCalendar } from "@/components/BigCalendar";
 import React from "react";
 
 export default function TeacherPage() {
@@ -8,7 +8,7 @@ export default function TeacherPage() {
       <div className="w-full lg:w-2/3">
         <div className="h-full bg-white p-4 rounded-md">
           <h1 className="text-xl ">Schedule</h1>
-          <BigCalender />
+          <BigCalendar />
         </div>
       </div>
 

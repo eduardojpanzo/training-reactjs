@@ -1,3 +1,4 @@
+import { FormModal } from "@/components/FormModal";
 import { Pagination } from "@/components/Pagination";
 import { Table } from "@/components/Table";
 import { TableSearch } from "@/components/TableSearch";
@@ -52,8 +53,8 @@ export default function AssignmentListPage() {
           {role === "admin" ||
             (role === "teacher" && (
               <>
-                {/* <FormModal table="assignment" type="update" data={item} />
-                <FormModal table="assignment" type="delete" id={item.id} /> */}
+                <FormModal table="assignment" type="update" data={item} />
+                <FormModal table="assignment" type="delete" id={item.id} />
               </>
             ))}
         </div>
@@ -77,10 +78,10 @@ export default function AssignmentListPage() {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {/* {role === "admin" ||
+            {role === "admin" ||
               (role === "teacher" && (
                 <FormModal table="assignment" type="create" />
-              ))} */}
+              ))}
           </div>
         </div>
       </div>
