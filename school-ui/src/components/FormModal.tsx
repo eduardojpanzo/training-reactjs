@@ -23,7 +23,7 @@ const forms: {
   student: (type, data) => <StudentForm type={type} data={data} />,
 };
 
-const FormModal = ({
+export function FormModal({
   table,
   type,
   data,
@@ -45,7 +45,7 @@ const FormModal = ({
   type: "create" | "update" | "delete";
   data?: any;
   id?: number;
-}) => {
+}) {
   const size = type === "create" ? "w-8 h-8" : "w-7 h-7";
   const bgColor =
     type === "create"
@@ -96,4 +96,4 @@ const FormModal = ({
       )}
     </>
   );
-};
+}
