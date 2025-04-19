@@ -1,0 +1,29 @@
+---
+title: "Estado vs. Props: O Coração da Lógica em React"
+publishedAt: "2025-04-19"
+summary: "Compreenda a diferença entre estado e propriedades em React e como essa separação afeta o design de componentes reutilizáveis."
+---
+
+Um dos primeiros conceitos que confunde quem aprende React é a distinção entre `state` e `props`. Ambos são usados para controlar dados, mas desempenham papéis muito diferentes.
+
+Vamos esclarecer a função de cada um e por que essa separação é tão importante para a arquitetura dos componentes.
+
+## O Que São Props?
+
+As _props_ (propriedades) são passadas de um componente pai para um componente filho. Elas são somente leitura, o que significa que o componente filho não pode alterá-las diretamente.
+
+Essa característica garante previsibilidade e facilita a reutilização de componentes com comportamentos diferentes, apenas mudando os valores passados.
+
+## O Que é o Estado?
+
+O `state` representa dados internos de um componente, que podem ser alterados dinamicamente. Por exemplo, uma lista de tarefas, o valor de um campo de input, ou a exibição de um modal.
+
+Mudanças no estado disparam re-renderizações automáticas, mantendo a interface sincronizada com os dados.
+
+## A Separação é Essencial
+
+Manter props e state bem definidos ajuda a evitar bugs e a construir componentes desacoplados. Props controlam de fora para dentro. Estado controla de dentro para fora. Essa separação traz clareza e escalabilidade para aplicações React.
+
+## Conclusão
+
+Entender quando usar estado ou props é uma habilidade fundamental para escrever código React eficiente e reutilizável. Mantenha-os separados, bem definidos, e sua base de código será mais limpa e fácil de manter.
