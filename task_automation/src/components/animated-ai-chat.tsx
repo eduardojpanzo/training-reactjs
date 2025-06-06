@@ -12,6 +12,7 @@ import { Textarea } from "./ui/text-area-ia";
 import { TypingDots } from "./typing-dots";
 
 import dynamic from "next/dynamic";
+import { Chat } from "./chat";
 
 const PDFUploader = dynamic(() => import("./pdf-uploader"), {
   ssr: false,
@@ -92,8 +93,8 @@ export function AnimatedAIChat() {
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
         <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-fuchsia-500/10 rounded-full mix-blend-normal filter blur-[96px] animate-pulse delay-1000" />
       </div>
-      <section className="min-h-screen grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(320px,0.5fr)] lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.25fr)] md:items-center">
-        <div className="w-full max-w-2xl mx-auto relative">
+      <section className="min-h-screen grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(320px,0.5fr)] lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.25fr)]">
+        <div className="w-full max-w-2xl max-h-screen mx-auto relative overflow-y-auto md:self-center md:min-w-[768px] lg:min-w-[896px] md:px-4">
           <motion.div
             className="relative z-10 space-y-12"
             initial={{ opacity: 0, y: 20 }}
@@ -102,7 +103,14 @@ export function AnimatedAIChat() {
           >
             {/* Seção Wellcome */}
             {conversation && conversation.length > 0 ? (
-              <div>Aqui</div>
+              <div>
+                <Chat
+                  data={conversation.map((item) => ({
+                    answer: "Aqui vem a resposta",
+                    quetion: item.ask,
+                  }))}
+                />
+              </div>
             ) : (
               <div className="text-center space-y-3">
                 <motion.div
@@ -133,7 +141,7 @@ export function AnimatedAIChat() {
             )}
 
             <motion.div
-              className="relative backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl"
+              className="relative max-w-2xl mx-auto backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl"
               initial={{ scale: 0.98 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.1 }}
@@ -196,7 +204,7 @@ export function AnimatedAIChat() {
           </motion.div>
         </div>
 
-        <div className="w-full min-w-80 min-h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] max-w-sm relative overflow-y-auto">
+        <div className="w-full min-w-80 min-h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] max-w-sm pt-4 relative overflow-y-auto">
           <PDFUploader />
         </div>
       </section>

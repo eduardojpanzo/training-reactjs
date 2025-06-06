@@ -172,7 +172,7 @@ export default function PdfUploader({ className }: PdfUploaderProps) {
               <button
                 onClick={() => handlePageChange(-1)}
                 disabled={pageNumber <= 1}
-                className="bg-transparent bg-white text-black/80 p-1 rounded-md border-none disabled:bg-gray-800 disabled:text-gray-300"
+                className="bg-transparent bg-white text-[#0A0A0B] p-1 rounded-md border-none disabled:bg-white/[0.05] disabled:text-white/40"
               >
                 <ChevronLeft />
               </button>
@@ -182,7 +182,7 @@ export default function PdfUploader({ className }: PdfUploaderProps) {
               <button
                 onClick={() => handlePageChange(1)}
                 disabled={pageNumber >= (numPages || 1)}
-                className="bg-transparent bg-white text-black/80 p-1 rounded-md border-none disabled:bg-gray-800 disabled:text-gray-300"
+                className="bg-transparent bg-white text-[#0A0A0B] p-1 rounded-md border-none disabled:bg-white/[0.05] disabled:text-white/40"
               >
                 <ChevronRight />
               </button>
