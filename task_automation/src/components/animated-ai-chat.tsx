@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SendIcon, LoaderIcon } from "lucide-react";
@@ -27,7 +27,6 @@ export function AnimatedAIChat() {
   const [value, setValue] = useState("");
   const [conversation, setConversation] = useState<ConversationData[]>();
   const [isTyping, setIsTyping] = useState(false);
-  const [, startTransition] = useTransition();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 60,
@@ -57,10 +56,10 @@ export function AnimatedAIChat() {
 
   const handleSendMessage = async () => {
     if (value.trim()) {
+      setIsTyping(true);
       const response = await handleSendPrompt(value);
 
-      startTransition(() => {
-        setIsTyping(true);
+      if (response) {
         setConversation((old) =>
           old
             ? [
@@ -77,12 +76,11 @@ export function AnimatedAIChat() {
                 },
               ]
         );
-        setTimeout(() => {
-          setIsTyping(false);
-          setValue("");
-          adjustHeight(true);
-        }, 3000);
-      });
+      }
+
+      setIsTyping(false);
+      setValue("");
+      adjustHeight(true);
     }
   };
 
@@ -106,7 +104,7 @@ export function AnimatedAIChat() {
               <div>
                 <Chat
                   data={conversation.map((item) => ({
-                    answer: "Aqui vem a resposta",
+                    answer: item.response,
                     quetion: item.ask,
                   }))}
                 />

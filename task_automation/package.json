@@ -19,6 +19,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.3.8",
     "react-pdf": "^9.2.1",
+    "sonner": "^2.0.5",
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {

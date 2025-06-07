@@ -16,6 +16,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { cn } from "@/lib/utils";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
+import { handleUploadPDF } from "@/service/ai.service";
 
 // Configura o worker do react-pdf para renderizar PDFs
 
@@ -36,14 +37,16 @@ export default function PdfUploader({ className }: PdfUploaderProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
+    async (acceptedFiles: File[]) => {
       const pdfs = acceptedFiles.filter(
         (file) => file.type === "application/pdf"
       );
       setPdfFiles((prev) => [...prev, ...pdfs]);
       if (pdfs.length > 0 && !currentPdf) {
-        setCurrentPdf(pdfs[0]);
-        setPageNumber(1);
+        if (await handleUploadPDF(pdfs[0])) {
+          setCurrentPdf(pdfs[0]);
+          setPageNumber(1);
+        }
       }
     },
     [currentPdf]
@@ -66,9 +69,11 @@ export default function PdfUploader({ className }: PdfUploaderProps) {
     );
   };
 
-  const selectPdf = (file: File) => {
-    setCurrentPdf(file);
-    setPageNumber(1);
+  const selectPdf = async (file: File) => {
+    if (await handleUploadPDF(file)) {
+      setCurrentPdf(file);
+      setPageNumber(1);
+    }
   };
 
   return (
