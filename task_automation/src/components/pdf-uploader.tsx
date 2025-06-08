@@ -3,16 +3,8 @@
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import {
-  ChevronLeft,
-  ChevronRight,
-  CloudUpload,
-  FilePlus,
-  MenuIcon,
-  X,
-} from "lucide-react";
+import { CloudUpload, FilePlus, Loader } from "lucide-react";
 import { useDropzone } from "react-dropzone";
-import { Document, Page, pdfjs } from "react-pdf";
 import { cn } from "@/lib/utils";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
@@ -20,36 +12,35 @@ import { handleUploadPDF } from "@/service/ai.service";
 
 // Configura o worker do react-pdf para renderizar PDFs
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
-
 interface PdfUploaderProps {
   className?: string;
+  currentPdf: File | null;
+  setCurrentPdf: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
-export default function PdfUploader({ className }: PdfUploaderProps) {
+export default function PdfUploader({
+  className,
+  currentPdf,
+  setCurrentPdf,
+}: PdfUploaderProps) {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
-  const [currentPdf, setCurrentPdf] = useState<File | null>(null);
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [showMenu, setShowMenu] = useState(false);
+  const [isloading, setIsLoading] = useState(false);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       const pdfs = acceptedFiles.filter(
         (file) => file.type === "application/pdf"
       );
-      setPdfFiles((prev) => [...prev, ...pdfs]);
       if (pdfs.length > 0 && !currentPdf) {
+        setIsLoading(true);
         if (await handleUploadPDF(pdfs[0])) {
+          setPdfFiles((prev) => [...prev, ...pdfs]);
           setCurrentPdf(pdfs[0]);
-          setPageNumber(1);
         }
+        setIsLoading(false);
       }
     },
-    [currentPdf]
+    [currentPdf, setCurrentPdf]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -58,22 +49,12 @@ export default function PdfUploader({ className }: PdfUploaderProps) {
     multiple: true,
   });
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setPageNumber(1);
-  };
-
-  const handlePageChange = (offset: number) => {
-    setPageNumber((prev) =>
-      Math.min(Math.max(prev + offset, 1), numPages || 1)
-    );
-  };
-
   const selectPdf = async (file: File) => {
+    setIsLoading(true);
     if (await handleUploadPDF(file)) {
       setCurrentPdf(file);
-      setPageNumber(1);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -91,12 +72,15 @@ export default function PdfUploader({ className }: PdfUploaderProps) {
           {
             "bg-blue-50 border-blue-500": isDragActive,
             "border-gray-400 bg-violet-500/10": !isDragActive,
+            ["hidden"]: currentPdf !== null,
           }
         )}
       >
         <input {...getInputProps()} />
         <p className="flex flex-col items-center justify-center text-sm">
-          {isDragActive ? (
+          {isloading ? (
+            <Loader className="w-6 h-6 text-zinc-400 animate-spin" />
+          ) : isDragActive ? (
             <>
               <FilePlus />
               Solte os arquivos PDF aqui...
@@ -112,88 +96,22 @@ export default function PdfUploader({ className }: PdfUploaderProps) {
 
       {/* Lista de PDFs carregados */}
       {pdfFiles.length > 0 && (
-        <div className="flex flex-col gap-2 relative">
-          <div
-            className="text-2xl font-bold cursor-pointer"
-            onClick={() => setShowMenu(!showMenu)}
-          >
-            {showMenu ? <X /> : <MenuIcon />}
-          </div>
-          <ul
-            className={clsx(
-              "gap-4 absolute top-8 p-1 rounded-b-lg bg-black/90 flex-col z-20",
-              {
-                ["hidden"]: !showMenu,
-                ["flex flex-col gap-1"]: showMenu,
-              }
-            )}
-          >
-            {pdfFiles?.map((file, index) => (
-              <li
-                key={index}
-                onClick={() => selectPdf(file)}
-                className={clsx(`p-2 rounded-md cursor-pointer text-xs`, {
-                  ["bg-blue-100 text-blue-700"]: currentPdf === file,
-                  ["bg-gray-100 text-gray-700"]: currentPdf !== file,
-                })}
-              >
-                {file.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Visualização do PDF */}
-      {currentPdf && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="border rounded-lg overflow-auto max-h-96 w-full">
-            <Document
-              file={currentPdf}
-              onLoadSuccess={onDocumentLoadSuccess}
-              className="flex justify-center"
+        <ul
+          className={"flex flex-col gap-1 top-8 p-1 rounded-b-lg bg-black/90 "}
+        >
+          {pdfFiles?.map((file, index) => (
+            <li
+              key={index}
+              onClick={() => selectPdf(file)}
+              className={clsx(`p-2 rounded-md cursor-pointer text-xs`, {
+                ["bg-blue-100 text-blue-700"]: currentPdf === file,
+                ["bg-gray-100 text-gray-700"]: currentPdf !== file,
+              })}
             >
-              <Page
-                pageNumber={pageNumber}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-                width={320}
-              />
-              {/* {Array.from(new Array(numPages), (_el, index) => (
-                <Page
-                  key={`page_${_el}`}
-                  pageNumber={index + 1}
-                  width={320}
-                  renderTextLayer={true}
-                  renderAnnotationLayer={true}
-                />
-              ))} */}
-            </Document>
-          </div>
-
-          {/* Controles de Navegação */}
-          {numPages && (
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => handlePageChange(-1)}
-                disabled={pageNumber <= 1}
-                className="bg-transparent bg-white text-[#0A0A0B] p-1 rounded-md border-none disabled:bg-white/[0.05] disabled:text-white/40"
-              >
-                <ChevronLeft />
-              </button>
-              <span>
-                {pageNumber} / {numPages}
-              </span>
-              <button
-                onClick={() => handlePageChange(1)}
-                disabled={pageNumber >= (numPages || 1)}
-                className="bg-transparent bg-white text-[#0A0A0B] p-1 rounded-md border-none disabled:bg-white/[0.05] disabled:text-white/40"
-              >
-                <ChevronRight />
-              </button>
-            </div>
-          )}
-        </div>
+              {file.name}
+            </li>
+          ))}
+        </ul>
       )}
     </motion.div>
   );

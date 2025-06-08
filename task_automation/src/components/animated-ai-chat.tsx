@@ -13,6 +13,7 @@ import { TypingDots } from "./typing-dots";
 
 import dynamic from "next/dynamic";
 import { Chat } from "./chat";
+import PdfPreview from "./pdf-preview";
 
 const PDFUploader = dynamic(() => import("./pdf-uploader"), {
   ssr: false,
@@ -25,6 +26,7 @@ interface ConversationData {
 
 export function AnimatedAIChat() {
   const [value, setValue] = useState("");
+  const [currentPdf, setCurrentPdf] = useState<File | null>(null);
   const [conversation, setConversation] = useState<ConversationData[]>();
   const [isTyping, setIsTyping] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -101,14 +103,12 @@ export function AnimatedAIChat() {
           >
             {/* Seção Wellcome */}
             {conversation && conversation.length > 0 ? (
-              <div>
-                <Chat
-                  data={conversation.map((item) => ({
-                    answer: item.response,
-                    quetion: item.ask,
-                  }))}
-                />
-              </div>
+              <Chat
+                data={conversation.map((item) => ({
+                  answer: item.response,
+                  quetion: item.ask,
+                }))}
+              />
             ) : (
               <div className="text-center space-y-3">
                 <motion.div
@@ -148,6 +148,7 @@ export function AnimatedAIChat() {
                 <Textarea
                   ref={textareaRef}
                   value={value}
+                  readOnly={isTyping || currentPdf === null}
                   onChange={(e) => {
                     setValue(e.target.value);
                     adjustHeight();
@@ -181,7 +182,7 @@ export function AnimatedAIChat() {
                   onClick={handleSendMessage}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={isTyping || !value.trim()}
+                  disabled={isTyping || !value.trim() || currentPdf === null}
                   className={cn(
                     "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                     "flex items-center gap-2",
@@ -203,7 +204,8 @@ export function AnimatedAIChat() {
         </div>
 
         <div className="w-full min-w-80 min-h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] max-w-sm pt-4 relative overflow-y-auto">
-          <PDFUploader />
+          <PDFUploader currentPdf={currentPdf} setCurrentPdf={setCurrentPdf} />
+          <PdfPreview currentPdf={currentPdf} />
         </div>
       </section>
 
